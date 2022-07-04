@@ -1,0 +1,18 @@
+CREATE TABLE [ds2019info](
+	[recnum] [int] IDENTITY(1,1) NOT NULL,
+	[idnumber] [int] NOT NULL,
+	[sponsor] [nvarchar](200) NULL,
+	[orgCode] [nvarchar](20) NULL,
+	[sevisid] [nvarchar](11) NULL,
+	[startProgram] [datetime] NULL,
+	[endProgram] [datetime] NULL,
+	[official] [nvarchar](200) NULL,
+	[street1] [nvarchar](255) NULL,
+	[street2] [nvarchar](255) NULL,
+	[city] [nvarchar](60) NULL,
+	[state] [nvarchar](2) NULL,
+	[postal] [nvarchar](20) NULL,
+	[phone] [nvarchar](20) NULL,
+	[email] [nvarchar](255) NULL,
+	[directBill] [bit] NULL,
+	[datestamp] [datetime] NOT NULL)
