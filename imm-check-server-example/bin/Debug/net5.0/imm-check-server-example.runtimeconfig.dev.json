@@ -1,0 +1,8 @@
+{
+  "runtimeOptions": {
+    "additionalProbingPaths": [
+      "C:\\Users\\influ\\.dotnet\\store\\|arch|\\|tfm|",
+      "C:\\Users\\influ\\.nuget\\packages"
+    ]
+  }
+}
