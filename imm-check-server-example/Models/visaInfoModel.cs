@@ -1,4 +1,4 @@
-namespace imm_check_server_example {
+namespace imm_check_server_example.Models {
     public class visaInfo {
         public long recnum { get; set; }
         public long idnumber { get; set; }

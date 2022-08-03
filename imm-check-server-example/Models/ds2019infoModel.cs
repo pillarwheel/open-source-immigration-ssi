@@ -1,4 +1,4 @@
-namespace imm_check_server_example {
+namespace imm_check_server_example.Models {
     public class ds2019info {
 
         public long recnum { get; set; }
