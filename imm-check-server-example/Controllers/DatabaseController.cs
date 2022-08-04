@@ -23,8 +23,9 @@ namespace imm_check_server_example.Controllers
 		List<ImmDocI20> I20s = new List<ImmDocI20>();
 
 		// GetFullPath will complete the path for the file named passed in as a string.
-		string dataSource = "Data Source=" + Path.GetFullPath("../imm-doc-check.db");
-
+		
+		string dataSource = "Data Source=" + Path.GetFullPath("imm-doc-check.db");
+		//string dataSource = $"Data Source=C:\\Users\\sevic\\Code\\github\\open-source-immigration-ssi\\imm-check-server-example\\imm-doc-check.db";
 		// using will make sure that the resource is cleaned from memory after it exists
 		// conn initializes the connection to the .db file.
 		using(SqliteConnection conn = new SqliteConnection(dataSource)) {
@@ -32,7 +33,7 @@ namespace imm_check_server_example.Controllers
 			conn.Open();
 
 			// sql is the string that will be run as an sql command
-			string sql = $"SELECT * FROM I20Program limit 200;";
+			string sql = $"SELECT * FROM I20Program;";
 
 			// command combines the connection and the command string and creates the query
 			using(SqliteCommand command = new SqliteCommand(sql, conn)) {
