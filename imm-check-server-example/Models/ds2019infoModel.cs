@@ -1,5 +1,5 @@
 namespace imm_check_server_example.Models {
-    public class ds2019info {
+    public class ImmDocDS2019info {
 
         public long recnum { get; set; }
         public long idnumber { get; set; }

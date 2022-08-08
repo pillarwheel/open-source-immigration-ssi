@@ -1,5 +1,5 @@
 namespace imm_check_server_example.Models {
-    public class I94 {
+    public class ImmDocI94 {
         public long recnum { get; set; }
         public long idnumber { get; set; }
         public string? i94num { get; set; }
