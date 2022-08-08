@@ -19,8 +19,13 @@ namespace imm_check_server_example.Controllers
 	[HttpGet]
 	public List<ImmDocI20> GetData() {
 
-		// tracks will be populated with the result of the query.
+		// Populate with the result of the queries.
 		List<ImmDocI20> I20s = new List<ImmDocI20>();
+		List<ImmDocDS2019info> DS2019s = new List<ImmDocDS2019info>();
+		List<ImmDocI94> I94s = new List<ImmDocI94>();
+		List<ImmDocPassport> Passports = new List<ImmDocPassport>();
+		List<ImmDocVisaInfo> VisaInfos = new List<ImmDocVisaInfo>();
+		List<SponsoredStudentInformation> SponsoredStudentInformation = new List<SponsoredStudentInformation>();
 
 		// GetFullPath will complete the path for the file named passed in as a string.
 		
@@ -33,116 +38,19 @@ namespace imm_check_server_example.Controllers
 			conn.Open();
 
 			// sql is the string that will be run as an sql command
-			string sql = $"SELECT * FROM I20Program;";
+			string sqlI20Program = $"SELECT * FROM I20Program;";
+			string sqlDS2019Info = $"SELECT * FROM ds2019info;";
+			string sqlImmDocI94 = $"SELECT * FROM I94;";
+			string sqlImmDocPassport = $"SELECT * FROM passport;";
+			string sqlVisaInfo = $"SELECT * FROM sponsoredStudentInformation;";
+			string sqlSponsoredStudentInformation = $"SELECT * FROM sponsoredStudentInformation;";
 
 			// command combines the connection and the command string and creates the query
-			using(SqliteCommand command = new SqliteCommand(sql, conn)) {
-
+			using(SqliteCommand command = new SqliteCommand(sqlI20Program, conn)) {
 				// reader allows you to read each value that comes back and do something to it.
 				using(SqliteDataReader reader = command.ExecuteReader()) {
-
 					// Read returns true while there are more rows to advance to. then false when done.
 					while (reader.Read()) {
-	/*I20Program:
-	-------------
-		[recnum] [int] IDENTITY(1,1) NOT NULL,
-		[idnumber] [int] NOT NULL,
-		[sevisid] [nvarchar](11) NULL,
-		[status] [nvarchar](2) NULL,
-		[eduLevel] [nvarchar](2) NULL,
-		[eduComments] [nvarchar](500) NULL,
-		[primaryMajor] [nvarchar](10) NULL,
-		[secondMajor] [nvarchar](10) NULL,
-		[minor] [nvarchar](10) NULL,
-		[lengthOfStudy] [nvarchar](2) NULL,
-		[prgStartDate] [datetime] NULL,
-		[prgEndDate] [datetime] NULL,
-		[engRequired] [bit] NOT NULL,
-		[engRequirementsMet] [bit] NOT NULL,
-		[engNotRequired] [nvarchar](500) NULL,
-		[datestamp] [datetime] NOT NULL,
-		[institutionalKey] [nvarchar](100) NULL,
-		[issDate] [datetime] NULL)
-
-
-		[I94]
-		*****
-		[recnum] [int] IDENTITY(1,1) NOT NULL,
-		[idnumber] [int] NOT NULL,
-		[i94num] [nvarchar](11) NULL,
-		[i94poe] [nvarchar](5) NULL,
-		[i94iss] [datetime] NULL,
-		[i94exp] [datetime] NULL,
-		[i94expds] [bit] NOT NULL,
-		[datestamp] [datetime] NOT NULL)
-
-
-	[ds2019info]
-	************
-		[recnum] [int] IDENTITY(1,1) NOT NULL,
-		[idnumber] [int] NOT NULL,
-		[sponsor] [nvarchar](200) NULL,
-		[orgCode] [nvarchar](20) NULL,
-		[sevisid] [nvarchar](11) NULL,
-		[startProgram] [datetime] NULL,
-		[endProgram] [datetime] NULL,
-		[official] [nvarchar](200) NULL,
-		[street1] [nvarchar](255) NULL,
-		[street2] [nvarchar](255) NULL,
-		[city] [nvarchar](60) NULL,
-		[state] [nvarchar](2) NULL,
-		[postal] [nvarchar](20) NULL,
-		[phone] [nvarchar](20) NULL,
-		[email] [nvarchar](255) NULL,
-		[directBill] [bit] NULL,
-		[datestamp] [datetime] NOT NULL)
-
-
-	[passport]
-	**********
-		[recnum] [int] IDENTITY(1,1) NOT NULL,
-		[idnumber] [int] NOT NULL,
-		[givenName] [nvarchar](101) NULL,
-		[lastname] [nvarchar](50) NULL,
-		[cpass] [nvarchar](5) NULL,
-		[passnum] [nvarchar](255) NULL,
-		[passiss] [datetime] NULL,
-		[passexp] [datetime] NULL,
-		[datestamp] [datetime] NOT NULL)
-
-
-	[visaInfo]
-	**********
-		[recnum] [int] IDENTITY(1,1) NOT NULL,
-		[idnumber] [int] NOT NULL,
-		[status] [nvarchar](10) NULL,
-		[visastamp] [nvarchar](10) NULL,
-		[stampnum] [nvarchar](255) NULL,
-		[controlnumber] [nvarchar](255) NULL,
-		[stampplace] [nvarchar](50) NULL,
-		[stampent] [nvarchar](5) NULL,
-		[stampiss] [datetime] NULL,
-		[stampexp] [datetime] NULL,
-		[datestamp] [datetime] NOT NULL)
-
-
-	[sponsoredStudentInformation]
-	*****************************
-		[recnum] [int] IDENTITY(1,1) NOT NULL,
-		[idnumber] [int] NOT NULL,
-		[sponsor] [nvarchar](200) NOT NULL,
-		[fundingSponsor] [nvarchar](200) NULL,
-		[advisorName] [nvarchar](100) NULL,
-		[advisorEmail] [nvarchar](255) NULL,
-		[advisorPhone] [nvarchar](20) NULL,
-		[isSponsoredStudent] [bit] NOT NULL,
-		[datestamp] [datetime] NOT NULL,
-		[isFeeExempt] [bit] NULL,
-		[isUSGovSponsored] [bit] NULL,
-		[needsFinancialDocs] [bit] NULL,
-		[financialDocsExpDate] [datetime] NULL)
-	*/
-						// map the data to the model.
 						ImmDocI20 newI20 = new ImmDocI20() {
                             recnum = reader.GetInt32(0),
 //							idnumber = reader.GetValue(1).ToString(),
@@ -164,14 +72,155 @@ namespace imm_check_server_example.Controllers
 							institutionalKey = reader.GetString(16),
 							issDate = reader.GetString(17)
 						};
-
 						// add each one to the list.
 						I20s.Add(newI20);
 					}
 				}
 			}
+			// command combines the connection and the command string and creates the query
+			using(SqliteCommand command = new SqliteCommand(sqlDS2019Info, conn)) {
+				// reader allows you to read each value that comes back and do something to it.
+				using(SqliteDataReader reader = command.ExecuteReader()) {
+					// Read returns true while there are more rows to advance to. then false when done.
+					while (reader.Read()) {
+						ImmDocDS2019info newDS2019 = new ImmDocDS2019info() {
+                            recnum = reader.GetInt32(0),
+							idnumber = reader.GetInt32(1),
+							sponsor = reader.GetString(2),
+							orgCode = reader.GetString(3),
+							sevisid = reader.GetString(4),
+							startProgram = reader.GetString(5),
+							endProgram = reader.GetString(6),
+							official = reader.GetString(7),
+							street1 = reader.GetString(8),
+							street2 = reader.GetString(9),
+							city = reader.GetString(10),
+							state = reader.GetString(11),
+							postal = reader.GetString(12),
+							phone = reader.GetString(13),
+							email = reader.GetString(14),
+							directBill = reader.GetString(15),
+							datestamp = reader.GetString(16)
+						};
+						DS2019s.Add(newDS2019);
+					}
+				}
+			}						
+			// command combines the connection and the command string and creates the query
+			using(SqliteCommand command = new SqliteCommand(sqlImmDocI94, conn)) {
+				// reader allows you to read each value that comes back and do something to it.
+				using(SqliteDataReader reader = command.ExecuteReader()) {
+					// Read returns true while there are more rows to advance to. then false when done.
+					while (reader.Read()) {
+						// map the data to the model.
+						ImmDocI94 newI94 = new ImmDocI94() {
+                            recnum = reader.GetInt32(0),
+							idnumber = reader.GetInt32(1),
+							i94num = reader.GetString(2),
+							i94poe = reader.GetString(3),
+							i94iss = reader.GetString(4),
+							i94exp = reader.GetString(5),
+							i94expds = reader.GetString(6),
+							datestamp = reader.GetString(7)
+						};
+						// add each one to the list.
+						I94s.Add(newI94);
+					}
+				}
+			}
+			// command combines the connection and the command string and creates the query
+			using(SqliteCommand command = new SqliteCommand(sqlImmDocPassport, conn)) {
+				// reader allows you to read each value that comes back and do something to it.
+				using(SqliteDataReader reader = command.ExecuteReader()) {
+					// Read returns true while there are more rows to advance to. then false when done.
+					while (reader.Read()) {
+						ImmDocPassport newPassport = new ImmDocPassport() {
+                            recnum = reader.GetInt32(0),
+							idnumber = reader.GetInt32(1),
+							givenName = reader.GetString(2),
+							lastname = reader.GetString(3),
+							cpass = reader.GetString(4),
+							passnum = reader.GetString(5),
+							passiss = reader.GetString(6),
+							passexp = reader.GetString(7),
+							datestamp = reader.GetString(8)
+						};
+						Passports.Add(newPassport);
+					}
+				}
+			}
+			// command combines the connection and the command string and creates the query
+			using(SqliteCommand command = new SqliteCommand(sqlVisaInfo, conn)) {
+				// reader allows you to read each value that comes back and do something to it.
+				using(SqliteDataReader reader = command.ExecuteReader()) {
+					// Read returns true while there are more rows to advance to. then false when done.
+					while (reader.Read()) {
+						ImmDocVisaInfo newVisaInfo = new ImmDocVisaInfo() {
+                            recnum = reader.GetInt32(0),
+							idnumber = reader.GetInt32(1),
+							status = reader.GetString(2),
+							visastamp = reader.GetString(3),
+							stampnum = reader.GetString(4),
+							controlnumber = reader.GetString(5),
+							stampplace = reader.GetString(6),
+							stampent = reader.GetString(7),
+							stampiss = reader.GetString(8),
+							stampexp = reader.GetString(8),
+							datestamp = reader.GetString(8)
+						};
+						VisaInfos.Add(newVisaInfo);
+					}
+				}
+			}						
+			// command combines the connection and the command string and creates the query
+			using(SqliteCommand command = new SqliteCommand(sqlSponsoredStudentInformation, conn)) {
+				// reader allows you to read each value that comes back and do something to it.
+				using(SqliteDataReader reader = command.ExecuteReader()) {
+					// Read returns true while there are more rows to advance to. then false when done.
+					while (reader.Read()) {
+						SponsoredStudentInformation newSponsoredStudentInformation = new SponsoredStudentInformation() {
+                            recnum = reader.GetInt32(0),
+							idnumber = reader.GetInt32(1),
+							sponsor = reader.GetString(2),
+							fundingSponsor = reader.GetString(3),
+							advisorName = reader.GetString(4),
+							advisorEmail = reader.GetString(5),
+							advisorPhone = reader.GetString(6),
+							isSponsoredStudent = reader.GetString(7),
+							datestamp = reader.GetString(8),
+							isFeeExempt = reader.GetString(8),
+							isUSGovSponsored = reader.GetString(8),
+							needsFinancialDocs = reader.GetString(8),
+							financialDocsExpDate = reader.GetString(8)
+						};
+						SponsoredStudentInformation.Add(newSponsoredStudentInformation);
+					}
+				}
+			}
 			conn.Close();
 		}
+		// List<ImmDocI20> I20s = new List<ImmDocI20>();
+		// var immigrationDocuments = new ImmDocCollection[]
+		// {
+
+		// };
+//I20s
+		foreach (var i20s in I20s)
+		{
+			//Do Something
+				
+		}
+
+/*
+
+        public ImmDocI20? immDocI20 { get; set; }
+        public ImmDocDS2019info? immDocDS2019info { get; set; }
+        public ImmDocI94? immDocI94 { get; set; }
+        public ImmDocPassport? immDocPassport { get; set; }
+        public ImmDocVisaInfo? immDocVisaInfo { get; set; }
+        public SponsoredStudentInformation?
+
+*/
 		return I20s;
 	}
 }
