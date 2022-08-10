@@ -208,7 +208,8 @@ namespace imm_check_server_example.Controllers
 		foreach (var i20s in I20s)
 		{
 			//Do Something
-				
+			Console.WriteLine("i20s.sevisid: ");
+			Console.WriteLine(i20s.sevisid);
 		}
 
 /*
