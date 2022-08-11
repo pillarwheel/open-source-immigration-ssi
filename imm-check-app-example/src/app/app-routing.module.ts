@@ -1,13 +1,13 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
-import { Ds2019Component } from './immigration-documents/ds2019/ds2019.component';
-import { I20Component } from './immigration-documents/i20/i20.component';
-import { I94Component } from './immigration-documents/i94/i94.component';
-import { PassportComponent } from './immigration-documents/passport/passport.component';
-import { SponsoredStudentsComponent } from './immigration-documents/sponsored-students/sponsored-students.component';
-import { VisaComponent } from './immigration-documents/visa/visa.component';
-import { VisaStampComponent } from './immigration-documents/visa-stamp/visa-stamp.component';
+import { CommonModule } from '@angular/common';
+import { Ds2019Component } from './modules/immigration-documents/ds2019/ds2019.component';
+import { I20Component } from './modules/immigration-documents/i20/i20.component';
+import { I94Component } from './modules/immigration-documents/i94/i94.component';
+import { PassportComponent } from './modules/immigration-documents/passport/passport.component';
+import { SponsoredStudentsComponent } from './modules/immigration-documents/sponsored-students/sponsored-students.component';
+import { VisaComponent } from './modules/immigration-documents/visa/visa.component';
+import { VisaStampComponent } from './modules/immigration-documents/visa-stamp/visa-stamp.component';
 
 const routes: Routes = [
   {
@@ -41,7 +41,11 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  imports: [
+    CommonModule,
+    RouterModule.forRoot(routes)
+  ],
+  exports: [RouterModule],
+  declarations: []
 })
 export class AppRoutingModule { }
