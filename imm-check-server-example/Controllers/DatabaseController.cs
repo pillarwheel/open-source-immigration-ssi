@@ -213,6 +213,9 @@ namespace imm_check_server_example.Controllers
 		}
 
 /*
+https://stackoverflow.com/questions/24999363/add-level-to-json-object-in-c-sharp
+
+https://www.softwaretestinghelp.com/create-json-structure-using-c/
 
         public ImmDocI20? immDocI20 { get; set; }
         public ImmDocDS2019info? immDocDS2019info { get; set; }
