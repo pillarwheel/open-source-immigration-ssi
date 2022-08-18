@@ -18,6 +18,7 @@ namespace imm_check_server_example.Models {
         public string? email { get; set; }
         public string? directBill { get; set; }
         public string? datestamp { get; set; }
+        public string? ipfsCID { get; set; }
 
     }
 }

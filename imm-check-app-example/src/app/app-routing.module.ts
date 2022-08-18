@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Ds2019Component } from './modules/immigration-documents/ds2019/ds2019.component';
+import { DisplayDs2019sComponent } from './modules/immigration-documents/ds2019/display-ds2019s/display-ds2019s.component';
 import { I20Component } from './modules/immigration-documents/i20/i20.component';
 import { I94Component } from './modules/immigration-documents/i94/i94.component';
 import { PassportComponent } from './modules/immigration-documents/passport/passport.component';
@@ -11,8 +11,8 @@ import { VisaStampComponent } from './modules/immigration-documents/visa-stamp/v
 
 const routes: Routes = [
   {
-    path: 'ds2019',
-    component: Ds2019Component
+    path: 'ds2019s',
+    component: DisplayDs2019sComponent
   },
   {
     path: 'i20',

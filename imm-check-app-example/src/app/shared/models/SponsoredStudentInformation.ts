@@ -12,5 +12,6 @@ export class SponsoredStudentInformation {
     isUSGovSponsored: string;
     needsFinancialDocs: string;
     financialDocsExpDate: string;
+    ipfsCID: string;
 }
 

@@ -9,5 +9,6 @@ namespace imm_check_server_example.Models {
         public string? passiss { get; set; }
         public string? passexp { get; set; }
         public string? datestamp { get; set; }
+        public string? ipfsCID { get; set; }
     }
 }      

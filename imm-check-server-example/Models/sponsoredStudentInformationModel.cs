@@ -13,5 +13,6 @@ namespace imm_check_server_example.Models {
         public string? isUSGovSponsored { get; set; }
         public string? needsFinancialDocs { get; set; }
         public string? financialDocsExpDate { get; set; }
+        public string? ipfsCID { get; set; }
     }
 }      

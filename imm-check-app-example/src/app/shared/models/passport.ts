@@ -8,4 +8,5 @@ export class passport {
     passiss: string;
     passexp: string;
     datestamp: string;
+    ipfsCID: string;
 }

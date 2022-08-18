@@ -1,7 +1,8 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
 import { AppRoutingModule } from './app-routing.module';
+import { Ds2019sModule } from './modules/immigration-documents/ds2019/ds2019s.module';
+
 import { AppComponent } from './app.component';
 import { PassportComponent } from './modules/immigration-documents/passport/passport.component';
 import { VisaComponent } from './modules/immigration-documents/visa/visa.component';
@@ -14,7 +15,8 @@ import { EyesComponent } from './modules/other-requirements/biometrics/eyes/eyes
 import { FingerprintsComponent } from './modules/other-requirements/biometrics/fingerprints/fingerprints.component';
 import { FaceScanComponent } from './modules/other-requirements/biometrics/face-scan/face-scan.component';
 import { DnaComponent } from './modules/other-requirements/dna/dna.component';
-import { DisplayDs2019Component } from './modules/immigration-documents/ds2019s/components/display-ds2019/display-ds2019.component';
+//import { DisplayDs2019sComponent } from './modules/immigration-documents/ds2019s/display-ds2019s/display-ds2019s.component';
+import { HttpClientModule, HttpClient, HttpHeaders } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -28,12 +30,13 @@ import { DisplayDs2019Component } from './modules/immigration-documents/ds2019s/
     EyesComponent,
     FingerprintsComponent,
     FaceScanComponent,
-    DnaComponent,
-    DisplayDs2019Component
+    DnaComponent
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    HttpClientModule,
+    Ds2019sModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -10,4 +10,5 @@ export class visa {
     stampiss: string;
     stampexp: string;
     datestamp: string;
+    ipfsCID: string;
 }

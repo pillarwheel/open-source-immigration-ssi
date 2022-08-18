@@ -16,4 +16,5 @@ export class ds2019 {
     email: string;
     directBill: string;
     datestamp: string;
+    ipfsCID: string;
 }

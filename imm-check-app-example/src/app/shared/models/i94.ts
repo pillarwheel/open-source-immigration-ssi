@@ -6,4 +6,5 @@ export class i94 {
     i94iss: string;
     i94expds: string;
     datestamp: string;
+    ipfsCID: string;
 }
