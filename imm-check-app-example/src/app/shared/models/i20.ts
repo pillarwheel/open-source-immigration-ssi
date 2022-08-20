@@ -16,4 +16,5 @@ export class i20 {
     datestamp: string;
     institutionalKey: string;
     issDate: string;
+    ipfsCID: string;
 }

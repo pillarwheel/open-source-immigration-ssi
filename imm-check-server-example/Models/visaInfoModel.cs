@@ -11,5 +11,6 @@ namespace imm_check_server_example.Models {
         public string? stampiss { get; set; }
         public string? stampexp { get; set; }
         public string? datestamp { get; set; }
+        public string? ipfsCID { get; set; }
     }
 }

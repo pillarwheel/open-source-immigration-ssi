@@ -8,5 +8,6 @@ namespace imm_check_server_example.Models {
         public string? i94exp { get; set; }
         public string? i94expds { get; set; }
         public string? datestamp { get; set; }
+        public string? ipfsCID { get; set; }
     }
 }        
