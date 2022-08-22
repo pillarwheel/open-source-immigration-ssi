@@ -3,6 +3,8 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { HttpClientModule, HttpClient, HttpHeaders } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+import { MdbFormsModule } from 'mdb-angular-ui-kit/forms';
 // LOAD OUR MODULES
 import { Ds2019Module } from './modules/immigration-documents/ds2019/ds2019.module';
 import { I20Module } from './modules/immigration-documents/i20/i20.module';
@@ -49,6 +51,8 @@ import { DisplayVisaStampsComponent } from './modules/immigration-documents/visa
     FaceScanModule,
     FingerprintsModule,
     DnaModule,
+    FormsModule,
+    MdbFormsModule,
     TranscriptsModule,
 //    DisplayDs2019sComponent,
 //    DisplayI20sComponent,

@@ -1,6 +1,8 @@
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 //import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ds2019 } from 'src/app/shared/models/ds2019';
+import { FormGroup, Validators, FormBuilder } from '@angular/forms';
+import { MdbFormsModule } from 'mdb-angular-ui-kit/forms';
 
 @Component({
   selector: 'app-display-ds2019',
@@ -23,6 +25,10 @@ export class DisplayDs2019Component implements OnInit {
 
   onClickView() {
     this.ds2019Viewed.emit(this.ds2019.ipfsCID);
+  }
+
+  onClickSubmit(result: any) {
+    console.log("You have entered : " + result.username); 
   }
 //ipfs://QmQqzMTavQgT4f4T5v6PWBp7XNKtoPmC9jvn12WPT3gkSE
 //https://ipfs.io/ipfs/QmQqzMTavQgT4f4T5v6PWBp7XNKtoPmC9jvn12WPT3gkSE
