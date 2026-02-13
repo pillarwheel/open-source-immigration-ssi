@@ -1,15 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-display-eyes-info',
+  standalone: true,
   templateUrl: './display-eyes-info.component.html',
   styleUrls: ['./display-eyes-info.component.css']
 })
-export class DisplayEyesInfoComponent implements OnInit {
-
-  constructor() { }
-
-  ngOnInit(): void {
-  }
-
-}
+export class DisplayEyesInfoComponent { }

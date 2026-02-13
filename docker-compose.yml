@@ -1,0 +1,88 @@
+services:
+  # --- Application Services ---
+  api:
+    build:
+      context: ./src
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=Data Source=/data/imm-doc-check.db
+      - Identus__AgentUrl=http://identus-cloud-agent:8085/cloud-agent
+      - Identus__ApiKey=${IDENTUS_API_KEY:-}
+      - Cheqd__ResolverUrl=https://resolver.cheqd.net
+      - UniversalResolver__Url=http://universal-resolver:8080
+      - Jwt__Key=ImmCheckSuperSecretKey2024ForJwtTokenGeneration!
+      - Jwt__Issuer=ImmCheck
+      - Jwt__Audience=ImmCheck
+    volumes:
+      - ./imm-check-server-example/imm-doc-check.db:/data/imm-doc-check.db
+    depends_on:
+      - identus-cloud-agent
+
+  frontend:
+    build:
+      context: ./imm-check-app-example
+      dockerfile: Dockerfile
+    ports:
+      - "4200:4200"
+    depends_on:
+      - api
+
+  # --- Hyperledger Identus (did:prism / Cardano) ---
+  identus-cloud-agent:
+    image: ghcr.io/hyperledger/identus-cloud-agent:1.39.0
+    ports:
+      - "8085:8085"  # REST API
+      - "8090:8090"  # DIDComm
+    environment:
+      # Agent config
+      AGENT_API_PORT: 8085
+      AGENT_DIDCOMM_PORT: 8090
+      # Database
+      AGENT_DB_HOST: identus-db
+      AGENT_DB_PORT: 5432
+      AGENT_DB_NAME: agent
+      AGENT_DB_USER: postgres
+      AGENT_DB_PASSWORD: postgres
+      # Cardano preprod (testnet)
+      CARDANO_NETWORK: preprod
+      # Key management
+      SECRET_STORAGE_BACKEND: postgres
+      DEV_MODE: "true"
+    depends_on:
+      identus-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8085/cloud-agent/_system/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  identus-db:
+    image: postgres:16-alpine
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_MULTIPLE_DATABASES: agent
+    volumes:
+      - identus-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # --- DIF Universal Resolver (multi-method DID resolution) ---
+  universal-resolver:
+    image: universalresolver/uni-resolver-web:latest
+    ports:
+      - "8080:8080"
+
+volumes:
+  identus-db-data:

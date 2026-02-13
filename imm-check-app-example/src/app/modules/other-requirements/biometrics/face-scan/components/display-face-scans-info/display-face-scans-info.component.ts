@@ -1,15 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-display-face-scans-info',
+  standalone: true,
   templateUrl: './display-face-scans-info.component.html',
   styleUrls: ['./display-face-scans-info.component.css']
 })
-export class DisplayFaceScansInfoComponent implements OnInit {
-
-  constructor() { }
-
-  ngOnInit(): void {
-  }
-
-}
+export class DisplayFaceScansInfoComponent { }

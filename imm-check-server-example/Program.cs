@@ -1,42 +1,40 @@
-var  MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+using Microsoft.EntityFrameworkCore;
+using imm_check_server_example.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add EF Core with SQLite
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Add CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: MyAllowSpecificOrigins,
-                      policy  =>
-                      {
-//                          policy.WithOrigins("http://localhost:4200/",
-//                                            "https://localhost:4200/",
-//                                            "http://localhost:7272/");
-                            policy.AllowAnyOrigin();
-                            policy.AllowAnyMethod();
-                            policy.AllowAnyHeader();
-                      });
+    options.AddDefaultPolicy(policy =>
+    {
+        if (builder.Environment.IsDevelopment())
+        {
+            policy.WithOrigins("http://localhost:4200", "https://localhost:4200")
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        }
+    });
 });
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
-
 app.UseRouting();
-
-app.UseCors(MyAllowSpecificOrigins);
-
+app.UseCors();
 app.UseAuthorization();
 
 app.MapControllerRoute(
