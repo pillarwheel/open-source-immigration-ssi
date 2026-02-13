@@ -76,3 +76,6 @@ docker-compose.override.yml
 
 # Research docs (internal reference materials)
 research/docs
+
+# Claude Code conventions file (development-only)
+CLAUDE.md

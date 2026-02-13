@@ -1,7 +1,7 @@
-# Cardano Catalyst Fund 9 — Deliverables Report
+# Cardano Catalyst Fund 8 — Deliverables Report
 
 **Project:** Open Source Immigration SSI
-**Fund:** Catalyst Fund 9
+**Fund:** Catalyst Fund 8
 **Budget:** $1,800
 **Repository:** https://github.com/nicholasgasior/open-source-immigration-ssi
 
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-This project delivers an open-source system for managing international student immigration documents using Self-Sovereign Identity (SSI) and Verifiable Credentials, with Cardano blockchain integration via `did:prism` (Hyperledger Identus, formerly Atala PRISM).
+This project delivers an open-source system for managing international student immigration documents using Self-Sovereign Identity (SSI) and Verifiable Credentials, with Cardano blockchain integration via `did:prism` (Hyperledger Identus, formerly Atala PRISM — IOG contributed the Atala PRISM codebase to the Hyperledger Foundation in 2023; promoted to full project status as Hyperledger Identus in April 2024).
 
 The system enables U.S. university Designated School Officials (DSOs) to issue W3C Verifiable Credentials for immigration documents (I-20, financial support), supports SD-JWT selective disclosure (students prove enrollment without revealing SEVIS IDs), and implements OID4VC protocols for standards-compliant credential exchange.
 
@@ -40,6 +40,7 @@ Multi-method DID resolution and creation:
 - **did:key** — Local Ed25519 key generation and resolution
 - **did:web** — HTTPS-based DID Document resolution
 - **did:prism** — Cardano blockchain integration via Hyperledger Identus Cloud Agent
+- **did:midnight** — Midnight blockchain (ZK-SNARKs privacy chain) DID resolution
 - **DIF Universal Resolver** — Fallback for additional DID methods
 
 API endpoints: `POST /api/did/create`, `GET /api/did/resolve/{did}`, `GET /api/did/methods`
@@ -72,9 +73,13 @@ Full SD-JWT (Selective Disclosure JWT) credential system:
 - **Verification:** Cryptographic verification of JWT signatures and disclosure hashes
 - **Revocation:** Bitstring Status List v1.1 — efficient revocation with per-issuer status lists
 
-Credential schemas:
+Credential schemas (6 document types):
 - `I20Credential`: 8 required claims, 8 optional, 5 selectively disclosable
 - `FinancialSupportCredential`: 5 required claims, 12 optional, 8 selectively disclosable
+- `PassportCredential`: 7 required claims, 7 optional, 4 selectively disclosable (ICAO 9303 MRZ mapping)
+- `VisaCredential`: 5 required claims, 6 optional, 3 selectively disclosable
+- `DS2019Credential`: 7 required claims, 5 optional, 4 selectively disclosable
+- `I94Credential`: 5 required claims, 3 optional, 2 selectively disclosable
 
 ### 5. OID4VC Protocol Implementation
 
@@ -90,7 +95,7 @@ Standards-compliant credential exchange protocols:
 **OID4VP (OpenID for Verifiable Presentations):**
 - Presentation request creation with nonce/state tracking
 - Presentation submission and verification
-- Predefined verification scenarios: "Prove F-1 status", "Prove financial support"
+- Predefined verification scenarios: "Prove F-1 status", "Prove financial support", "Verify passport identity", "Prove J-1 status", "Verify admission status"
 
 ### 6. Authentication & Role-Based Access
 
@@ -125,15 +130,16 @@ Single-command deployment via `docker-compose up`:
 
 **Status: Complete**
 
-88 automated tests:
+119 automated tests:
 - 10 document endpoint integration tests
-- 12 DID resolution/publication integration tests
-- 12 credential issuance/verification integration tests
-- 7 OID4VCI/OID4VP flow integration tests
+- 14 DID resolution/publication integration tests (including did:midnight)
+- 16 credential issuance/verification integration tests (all 6 types)
+- 10 OID4VCI/OID4VP flow integration tests (5 scenarios)
 - 12 DID resolver + Base58 unit tests
-- 16 SD-JWT + credential schema unit tests
+- 32 SD-JWT + credential schema unit tests (all 6 types with selective disclosure)
 - 10 Ed25519 signing tests
 - 6 did:cheqd resolver tests
+- 6 did:midnight resolver tests
 - 3 additional utility tests
 
 ---
@@ -153,7 +159,7 @@ The system implements multiple W3C and IETF specifications:
 - OpenID for Verifiable Presentations (OID4VP)
 
 ### Cardano Integration
-DID operations are anchored to Cardano's preprod testnet via Hyperledger Identus, fulfilling the Catalyst Fund 9 obligation to demonstrate Cardano utility in immigration document management.
+DID operations are anchored to Cardano's preprod testnet via Hyperledger Identus (formerly Atala PRISM — IOG contributed to Hyperledger Foundation 2023, promoted to full project status April 2024), fulfilling the Catalyst Fund 8 obligation to demonstrate Cardano utility in immigration document management.
 
 ### Ed25519 Asymmetric Signing (Sprint 8)
 Credentials now use Ed25519 (EdDSA) asymmetric key pairs by default, replacing the prototype HMAC-SHA256 symmetric signing. This means any third party with the issuer's public key (from their DID document) can verify a credential without needing the issuer's secret key — a prerequisite for blockchain-anchored DIDs. Backward compatibility is maintained: existing HS256-signed credentials continue to verify.
@@ -163,6 +169,32 @@ Full DID lifecycle on Cardano: create → publish → resolve. The `POST /api/di
 
 ### Multi-Blockchain Support (Sprint 8)
 Added `did:cheqd` resolver for the cheqd Cosmos-based blockchain, demonstrating multi-blockchain DID resolution. Added DIF Universal Resolver container for fallback resolution of any DID method.
+
+### Full Immigration Document Credential Coverage (Sprint 9)
+Expanded credential schemas from 2 to 6, covering all immigration document types eligible for verifiable credentials: I-20, Financial Support, Passport, Visa, DS-2019, and I-94. Each schema defines required claims, optional claims, and per-document selective disclosure defaults.
+
+Key privacy feature: PassportCredential maps ICAO 9303 MRZ fields and enables proving nationality without revealing the passport document number, date of birth, or MRZ data.
+
+### Midnight Blockchain Integration (Sprint 9)
+Pre-built `did:midnight` resolver for IOG's privacy-focused Cardano partner chain. Midnight uses ZK-SNARKs for zero-knowledge identity proofs — enabling stronger privacy guarantees than SD-JWT selective disclosure alone (prove boolean facts about claims without revealing the claims themselves). The resolver is configured for Midnight's testnet and will be updated to mainnet when it launches (late March 2026).
+
+### Expanded OID4VP Verification Scenarios (Sprint 9)
+Added 3 new OID4VP presentation scenarios (total: 5): passport identity verification, J-1 exchange visitor status, and I-94 admission status. Updated format requirements to include `EdDSA` alongside `HS256` to reflect Sprint 8's Ed25519 upgrade.
+
+---
+
+## Regulatory Alignment
+
+This project aligns with active U.S. federal government initiatives in digital immigration credentials:
+
+- **DHS SVIP:** The DHS Science & Technology Directorate's Silicon Valley Innovation Program has funded 60+ companies since 2018 to build blockchain/VC solutions for immigration. ImmCheck implements the same W3C VC 2.0 and DID Core standards being funded commercially.
+- **USCIS Standards Adoption:** USCIS accepts electronic signatures (July 2023) and has proposed electronic document matching rules (November 2025). The W3C VC format used by ImmCheck is the standard USCIS and CBP are pursuing.
+- **NIST SP 800-63-4:** The July 2025 digital identity guidelines include digital wallets in the federal identity assurance framework, providing a federal basis for VC-based identity verification.
+- **W3C VC 2.0:** Reached W3C Recommendation status in May 2025, moving from draft to formal standard during this project's development.
+- **FERPA Compliance:** The off-chain privacy architecture (no PII on blockchain) aligns with FERPA requirements for student data protection.
+- **eIDAS 2.0:** EU digital identity wallets become mandatory in December 2026, and W3C VC interoperability ensures this system can work with European digital identity infrastructure.
+
+See [docs/compliance.md](compliance.md) for comprehensive regulatory analysis.
 
 ---
 

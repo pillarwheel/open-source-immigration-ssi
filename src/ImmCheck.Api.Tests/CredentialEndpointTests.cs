@@ -23,7 +23,7 @@ public class CredentialEndpointTests : IClassFixture<CustomWebApplicationFactory
         var json = await response.Content.ReadAsStringAsync();
         var schemas = JsonSerializer.Deserialize<JsonElement[]>(json);
         Assert.NotNull(schemas);
-        Assert.Equal(2, schemas.Length);
+        Assert.Equal(6, schemas.Length);
     }
 
     [Fact]
@@ -221,6 +221,58 @@ public class CredentialEndpointTests : IClassFixture<CustomWebApplicationFactory
         Assert.NotEmpty(doc.RootElement.GetProperty("encodedList").GetString()!);
     }
 
+    [Fact]
+    public async Task IssuePassportCredential_ReturnsCreated()
+    {
+        var request = CreatePassportRequest();
+        var response = await _client.PostAsJsonAsync("/api/credential/issue", request);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+        var result = await response.Content.ReadFromJsonAsync<IssuedCredential>();
+        Assert.NotNull(result);
+        Assert.NotEmpty(result.CredentialId);
+        Assert.Equal("vc+sd-jwt", result.Format);
+    }
+
+    [Fact]
+    public async Task IssueVisaCredential_ReturnsCreated()
+    {
+        var request = CreateVisaRequest();
+        var response = await _client.PostAsJsonAsync("/api/credential/issue", request);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+        var result = await response.Content.ReadFromJsonAsync<IssuedCredential>();
+        Assert.NotNull(result);
+        Assert.NotEmpty(result.CredentialId);
+        Assert.Equal("vc+sd-jwt", result.Format);
+    }
+
+    [Fact]
+    public async Task IssueDS2019Credential_ReturnsCreated()
+    {
+        var request = CreateDS2019Request();
+        var response = await _client.PostAsJsonAsync("/api/credential/issue", request);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+        var result = await response.Content.ReadFromJsonAsync<IssuedCredential>();
+        Assert.NotNull(result);
+        Assert.NotEmpty(result.CredentialId);
+        Assert.Equal("vc+sd-jwt", result.Format);
+    }
+
+    [Fact]
+    public async Task IssueI94Credential_ReturnsCreated()
+    {
+        var request = CreateI94Request();
+        var response = await _client.PostAsJsonAsync("/api/credential/issue", request);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+        var result = await response.Content.ReadFromJsonAsync<IssuedCredential>();
+        Assert.NotNull(result);
+        Assert.NotEmpty(result.CredentialId);
+        Assert.Equal("vc+sd-jwt", result.Format);
+    }
+
     private static CredentialIssuanceRequest CreateI20Request() => new()
     {
         IssuerDid = "did:key:z6MkIssuer",
@@ -258,6 +310,76 @@ public class CredentialEndpointTests : IClassFixture<CustomWebApplicationFactory
             ["personalFunds"] = 10000,
             ["schoolFunds"] = 30000,
             ["schoolFundsDescription"] = "Graduate Assistantship"
+        }
+    };
+
+    private static CredentialIssuanceRequest CreatePassportRequest() => new()
+    {
+        IssuerDid = "did:key:z6MkIssuer",
+        SubjectDid = "did:key:z6MkStudent",
+        CredentialType = "PassportCredential",
+        ValidityDays = 365,
+        Claims = new Dictionary<string, object>
+        {
+            ["holderName"] = "Jane Doe",
+            ["nationality"] = "United States",
+            ["issuingState"] = "USA",
+            ["documentNumber"] = "123456789",
+            ["dateOfBirth"] = "1995-03-15",
+            ["expirationDate"] = "2035-03-14",
+            ["sex"] = "F"
+        }
+    };
+
+    private static CredentialIssuanceRequest CreateVisaRequest() => new()
+    {
+        IssuerDid = "did:key:z6MkIssuer",
+        SubjectDid = "did:key:z6MkStudent",
+        CredentialType = "VisaCredential",
+        ValidityDays = 365,
+        Claims = new Dictionary<string, object>
+        {
+            ["holderName"] = "Jane Doe",
+            ["visaType"] = "F-1",
+            ["issuingPost"] = "London",
+            ["issueDate"] = "2024-06-01",
+            ["expirationDate"] = "2028-06-01",
+            ["stampNumber"] = "20241234567",
+            ["controlNumber"] = "20241234567890"
+        }
+    };
+
+    private static CredentialIssuanceRequest CreateDS2019Request() => new()
+    {
+        IssuerDid = "did:key:z6MkIssuer",
+        SubjectDid = "did:key:z6MkStudent",
+        CredentialType = "DS2019Credential",
+        ValidityDays = 365,
+        Claims = new Dictionary<string, object>
+        {
+            ["sevisId"] = "N0001234567",
+            ["participantName"] = "Jane Doe",
+            ["programSponsor"] = "University Exchange Program",
+            ["programNumber"] = "P-1-00001",
+            ["categoryCode"] = "1A",
+            ["programStartDate"] = "2024-08-15",
+            ["programEndDate"] = "2025-08-14"
+        }
+    };
+
+    private static CredentialIssuanceRequest CreateI94Request() => new()
+    {
+        IssuerDid = "did:key:z6MkIssuer",
+        SubjectDid = "did:key:z6MkStudent",
+        CredentialType = "I94Credential",
+        ValidityDays = 365,
+        Claims = new Dictionary<string, object>
+        {
+            ["holderName"] = "Jane Doe",
+            ["i94Number"] = "12345678901",
+            ["classOfAdmission"] = "F-1",
+            ["admissionDate"] = "2024-08-10",
+            ["admittedUntil"] = "D/S"
         }
     };
 }

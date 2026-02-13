@@ -68,12 +68,21 @@ import { CredentialService } from 'src/app/core/services/credential.service';
         <div class="card-header">Verification Scenarios (OID4VP)</div>
         <div class="card-body">
           <p class="text-muted">Request a specific proof from a holder:</p>
-          <div class="btn-group">
+          <div class="btn-group flex-wrap">
             <button class="btn btn-outline-primary" (click)="createPresentationRequest('f1-status')">
               Prove F-1 Status
             </button>
             <button class="btn btn-outline-primary" (click)="createPresentationRequest('financial-support')">
               Prove Financial Support
+            </button>
+            <button class="btn btn-outline-primary" (click)="createPresentationRequest('passport-identity')">
+              Verify Passport
+            </button>
+            <button class="btn btn-outline-primary" (click)="createPresentationRequest('j1-status')">
+              Prove J-1 Status
+            </button>
+            <button class="btn btn-outline-primary" (click)="createPresentationRequest('admission-status')">
+              Verify Admission
             </button>
           </div>
           <div *ngIf="presentationRequest" class="mt-3">

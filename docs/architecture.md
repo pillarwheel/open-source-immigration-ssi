@@ -189,6 +189,8 @@ public interface IDidManager
 
 **Context:** The system only supported did:key (local), did:web (HTTPS), and did:prism (Cardano). For 2026 immigration compliance and broader interoperability, additional blockchain DID methods are needed.
 
+**Naming note:** The `did:prism` method is implemented via **Hyperledger Identus**, formerly known as **Atala PRISM**. IOG (Input Output Global) originally developed Atala PRISM as Cardano's decentralized identity solution. In 2023, IOG contributed the codebase to the Hyperledger Foundation under the Linux Foundation. The project was promoted from Hyperledger Labs to full project status as **Hyperledger Identus** in April 2024. In October 2024, IOG reduced the dedicated Identus team, with community maintenance continuing under Hyperledger governance. References to "Atala PRISM" in external documentation refer to the same technology now maintained as Hyperledger Identus.
+
 **Decision:** Add `did:cheqd` resolver and DIF Universal Resolver fallback. Complete the Cardano lifecycle with DID publication endpoints.
 
 **New components:**
@@ -206,4 +208,48 @@ public interface IDidManager
 - `GET /api/did/status/{did}` — Get DID publication status
 - `GET /api/did/methods` — Now includes `"cheqd"` in resolve list
 
-**Consequences:** The system now supports 4 DID methods natively and any method via the Universal Resolver. Cardano DIDs can be fully created, published, and resolved — completing the Catalyst Fund 9 obligation.
+**Consequences:** The system now supports 4 DID methods natively and any method via the Universal Resolver. Cardano DIDs can be fully created, published, and resolved — completing the Catalyst Fund 8 obligation.
+
+---
+
+## ADR-10: Credential Schema Expansion (Sprint 9)
+
+**Context:** Only 2 of 7 immigration document types had credential schemas (I20, FinancialSupport). The tech specs identify passport MRZ data and visa information as prime candidates for verifiable credentials. Without schemas for all document types, the system cannot fulfill its goal of comprehensive immigration credential coverage.
+
+**Decision:** Add credential schemas for all remaining document types: PassportCredential, VisaCredential, DS2019Credential, I94Credential.
+
+**Design principles:**
+- **ICAO 9303 mapping** for PassportCredential — required claims mirror the machine-readable zone (MRZ) fields: holderName, nationality, issuingState, documentNumber, dateOfBirth, expirationDate, sex
+- **Per-document selective disclosure** — each schema identifies which claims are sensitive and should be hidden by default:
+  - Passport: documentNumber, dateOfBirth, MRZ lines (prove nationality without passport number)
+  - Visa: stampNumber, controlNumber (prove visa type without control numbers)
+  - DS-2019: sevisId, participantName (prove program status without personal identifiers)
+  - I-94: i94Number, holderName (prove admission class without I-94 number)
+- **OID4VP scenarios** expanded from 2 to 5 — each new credential type has a corresponding verification scenario
+- **Format requirements** updated to `["EdDSA", "HS256"]` (Sprint 8 Ed25519 upgrade reflected in OID4VP)
+
+**Consequences:** All 6 credential-eligible document types now have schemas. The frontend issuance form offers all 6 types. The OID4VP scenarios cover the main immigration verification use cases: F-1 status, J-1 status, financial support, passport identity, and admission status.
+
+---
+
+## ADR-11: Midnight Blockchain Integration (Sprint 9)
+
+**Context:** Midnight is IOG's privacy-focused Cardano partner chain, launching mainnet late March 2026. It uses `did:midnight` identifiers and ZK-SNARKs for privacy-preserving identity proofs. For immigration credentials, this enables proving nationality or enrollment status without revealing any PII — a stronger privacy guarantee than SD-JWT selective disclosure alone.
+
+**Decision:** Pre-build a `DidMidnightResolver` following the exact pattern of `DidCheqdResolver` (DIF DID Resolution API format). Configure with a default testnet URL that can be updated to mainnet when available.
+
+**Implementation:**
+- `DidMidnightResolver` implements `IDidResolver` with `Method = "midnight"` and prefix `did:midnight:`
+- Calls `{resolverUrl}/1.0/identifiers/{did}` (DIF format) — same as cheqd and universal resolvers
+- Config key: `Midnight:ResolverUrl` (default: `https://indexer.testnet.midnight.network`)
+- Graceful degradation: returns null on 404 or network error (testnet may not be available)
+- Registered in DI alongside other resolvers — appears in `GET /api/did/methods` resolve list
+
+**ZK-proof privacy model (future):** When Midnight mainnet launches, the system could leverage ZK-SNARKs to:
+1. Prove nationality from a PassportCredential without revealing the passport number, name, or date of birth
+2. Prove enrollment status without revealing any claims — just a boolean "is valid F-1 student"
+3. Prove financial sufficiency without revealing amounts — just "meets minimum threshold"
+
+This goes beyond SD-JWT selective disclosure (which still reveals individual claim values) to full zero-knowledge proofs.
+
+**Consequences:** The resolver is ready for Midnight mainnet. When launched, only the config URL needs to change. The ZK-proof integration is a future sprint — Sprint 9 provides the DID infrastructure foundation.

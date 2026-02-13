@@ -130,7 +130,7 @@ public class OID4VCEndpointTests : IClassFixture<CustomWebApplicationFactory>
         var json = await response.Content.ReadAsStringAsync();
         var scenarios = JsonSerializer.Deserialize<JsonElement[]>(json);
         Assert.NotNull(scenarios);
-        Assert.Equal(2, scenarios.Length);
+        Assert.Equal(5, scenarios.Length);
     }
 
     [Fact]
@@ -203,5 +203,47 @@ public class OID4VCEndpointTests : IClassFixture<CustomWebApplicationFactory>
         statusResponse.EnsureSuccessStatusCode();
         var status = await statusResponse.Content.ReadFromJsonAsync<JsonElement>();
         Assert.Equal("completed", status.GetProperty("status").GetString());
+    }
+
+    [Fact]
+    public async Task CreatePresentationRequest_PassportIdentity_ReturnsDefinition()
+    {
+        var response = await _client.PostAsJsonAsync("/api/oid4vp/request", new { scenario = "passport-identity" });
+        response.EnsureSuccessStatusCode();
+
+        var request = await response.Content.ReadFromJsonAsync<PresentationRequest>();
+        Assert.NotNull(request);
+        Assert.Equal("vp_token", request.ResponseType);
+        Assert.NotEmpty(request.Nonce);
+        Assert.NotNull(request.PresentationDefinition);
+        Assert.Equal("passport-identity-verification", request.PresentationDefinition.Id);
+    }
+
+    [Fact]
+    public async Task CreatePresentationRequest_J1Status_ReturnsDefinition()
+    {
+        var response = await _client.PostAsJsonAsync("/api/oid4vp/request", new { scenario = "j1-status" });
+        response.EnsureSuccessStatusCode();
+
+        var request = await response.Content.ReadFromJsonAsync<PresentationRequest>();
+        Assert.NotNull(request);
+        Assert.Equal("vp_token", request.ResponseType);
+        Assert.NotEmpty(request.Nonce);
+        Assert.NotNull(request.PresentationDefinition);
+        Assert.Equal("j1-status-verification", request.PresentationDefinition.Id);
+    }
+
+    [Fact]
+    public async Task CreatePresentationRequest_AdmissionStatus_ReturnsDefinition()
+    {
+        var response = await _client.PostAsJsonAsync("/api/oid4vp/request", new { scenario = "admission-status" });
+        response.EnsureSuccessStatusCode();
+
+        var request = await response.Content.ReadFromJsonAsync<PresentationRequest>();
+        Assert.NotNull(request);
+        Assert.Equal("vp_token", request.ResponseType);
+        Assert.NotEmpty(request.Nonce);
+        Assert.NotNull(request.PresentationDefinition);
+        Assert.Equal("admission-status-verification", request.PresentationDefinition.Id);
     }
 }

@@ -13,6 +13,7 @@ services:
       - Identus__AgentUrl=http://identus-cloud-agent:8085/cloud-agent
       - Identus__ApiKey=${IDENTUS_API_KEY:-}
       - Cheqd__ResolverUrl=https://resolver.cheqd.net
+      - Midnight__ResolverUrl=https://indexer.testnet.midnight.network
       - UniversalResolver__Url=http://universal-resolver:8080
       - Jwt__Key=ImmCheckSuperSecretKey2024ForJwtTokenGeneration!
       - Jwt__Issuer=ImmCheck

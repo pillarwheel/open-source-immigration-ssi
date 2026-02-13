@@ -39,6 +39,9 @@ public class OID4VPController : ControllerBase
             {
                 "f1-status" => PredefinedPresentations.ProveF1Status(),
                 "financial-support" => PredefinedPresentations.ProveFinancialSupport(),
+                "passport-identity" => PredefinedPresentations.ProvePassportIdentity(),
+                "j1-status" => PredefinedPresentations.ProveJ1Status(),
+                "admission-status" => PredefinedPresentations.ProveAdmissionStatus(),
                 _ => definition
             };
         }
@@ -120,14 +123,17 @@ public class OID4VPController : ControllerBase
         return Ok(new[]
         {
             new { id = "f1-status", name = "Prove F-1 Student Status", description = "Verify valid F-1 enrollment via I-20 credential" },
-            new { id = "financial-support", name = "Prove Financial Support", description = "Verify sufficient funding for studies" }
+            new { id = "financial-support", name = "Prove Financial Support", description = "Verify sufficient funding for studies" },
+            new { id = "passport-identity", name = "Verify Passport Identity", description = "Verify nationality and passport validity without exposing document number" },
+            new { id = "j1-status", name = "Prove J-1 Status", description = "Verify J-1 exchange visitor status via DS-2019 credential" },
+            new { id = "admission-status", name = "Verify Admission Status", description = "Verify current admission status and class of admission via I-94" }
         });
     }
 }
 
 public class CreatePresentationRequest
 {
-    /// <summary>Use a predefined scenario: "f1-status" or "financial-support".</summary>
+    /// <summary>Use a predefined scenario: "f1-status", "financial-support", "passport-identity", "j1-status", or "admission-status".</summary>
     public string? Scenario { get; set; }
 
     /// <summary>Custom presentation definition (if not using a predefined scenario).</summary>
@@ -153,7 +159,7 @@ public static class PredefinedPresentations
                 Purpose = "Proof of enrollment in a U.S. educational institution",
                 Format = new Dictionary<string, FormatRequirement>
                 {
-                    ["vc+sd-jwt"] = new() { Alg = new List<string> { "HS256" } }
+                    ["vc+sd-jwt"] = new() { Alg = new List<string> { "EdDSA", "HS256" } }
                 },
                 Constraints = new Constraints
                 {
@@ -192,7 +198,7 @@ public static class PredefinedPresentations
                 Purpose = "Proof of funding for academic expenses",
                 Format = new Dictionary<string, FormatRequirement>
                 {
-                    ["vc+sd-jwt"] = new() { Alg = new List<string> { "HS256" } }
+                    ["vc+sd-jwt"] = new() { Alg = new List<string> { "EdDSA", "HS256" } }
                 },
                 Constraints = new Constraints
                 {
@@ -210,6 +216,135 @@ public static class PredefinedPresentations
                         new()
                         {
                             Path = new List<string> { "$.vc.credentialSubject.totalExpenses" }
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    public static PresentationDefinition ProvePassportIdentity() => new()
+    {
+        Id = "passport-identity-verification",
+        Name = "Passport Identity Verification",
+        Purpose = "Verify nationality and passport validity without exposing document number",
+        InputDescriptors = new List<InputDescriptor>
+        {
+            new()
+            {
+                Id = "passport-credential",
+                Name = "Passport Credential",
+                Purpose = "Verify nationality and passport validity without exposing document number",
+                Format = new Dictionary<string, FormatRequirement>
+                {
+                    ["vc+sd-jwt"] = new() { Alg = new List<string> { "EdDSA", "HS256" } }
+                },
+                Constraints = new Constraints
+                {
+                    Fields = new List<FieldConstraint>
+                    {
+                        new()
+                        {
+                            Path = new List<string> { "$.vc.type" },
+                            Filter = new FilterConstraint { Type = "string", Const = "PassportCredential" }
+                        },
+                        new()
+                        {
+                            Path = new List<string> { "$.vc.credentialSubject.nationality" }
+                        },
+                        new()
+                        {
+                            Path = new List<string> { "$.vc.credentialSubject.expirationDate" }
+                        },
+                        new()
+                        {
+                            Path = new List<string> { "$.vc.credentialSubject.holderName" }
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    public static PresentationDefinition ProveJ1Status() => new()
+    {
+        Id = "j1-status-verification",
+        Name = "J-1 Exchange Visitor Status Verification",
+        Purpose = "Verify J-1 exchange visitor status",
+        InputDescriptors = new List<InputDescriptor>
+        {
+            new()
+            {
+                Id = "ds2019-credential",
+                Name = "DS-2019 Credential",
+                Purpose = "Verify J-1 exchange visitor status",
+                Format = new Dictionary<string, FormatRequirement>
+                {
+                    ["vc+sd-jwt"] = new() { Alg = new List<string> { "EdDSA", "HS256" } }
+                },
+                Constraints = new Constraints
+                {
+                    Fields = new List<FieldConstraint>
+                    {
+                        new()
+                        {
+                            Path = new List<string> { "$.vc.type" },
+                            Filter = new FilterConstraint { Type = "string", Const = "DS2019Credential" }
+                        },
+                        new()
+                        {
+                            Path = new List<string> { "$.vc.credentialSubject.programSponsor" }
+                        },
+                        new()
+                        {
+                            Path = new List<string> { "$.vc.credentialSubject.categoryCode" }
+                        },
+                        new()
+                        {
+                            Path = new List<string> { "$.vc.credentialSubject.participantName" }
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    public static PresentationDefinition ProveAdmissionStatus() => new()
+    {
+        Id = "admission-status-verification",
+        Name = "Admission Status Verification",
+        Purpose = "Verify current admission status and class of admission",
+        InputDescriptors = new List<InputDescriptor>
+        {
+            new()
+            {
+                Id = "i94-credential",
+                Name = "I-94 Credential",
+                Purpose = "Verify current admission status and class of admission",
+                Format = new Dictionary<string, FormatRequirement>
+                {
+                    ["vc+sd-jwt"] = new() { Alg = new List<string> { "EdDSA", "HS256" } }
+                },
+                Constraints = new Constraints
+                {
+                    Fields = new List<FieldConstraint>
+                    {
+                        new()
+                        {
+                            Path = new List<string> { "$.vc.type" },
+                            Filter = new FilterConstraint { Type = "string", Const = "I94Credential" }
+                        },
+                        new()
+                        {
+                            Path = new List<string> { "$.vc.credentialSubject.classOfAdmission" }
+                        },
+                        new()
+                        {
+                            Path = new List<string> { "$.vc.credentialSubject.admittedUntil" }
+                        },
+                        new()
+                        {
+                            Path = new List<string> { "$.vc.credentialSubject.holderName" }
                         }
                     }
                 }

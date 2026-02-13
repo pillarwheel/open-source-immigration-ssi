@@ -27,6 +27,10 @@ import { CredentialService } from 'src/app/core/services/credential.service';
                         (change)="onTypeChange()">
                   <option value="I20Credential">I-20 Credential</option>
                   <option value="FinancialSupportCredential">Financial Support Credential</option>
+                  <option value="PassportCredential">Passport Credential</option>
+                  <option value="VisaCredential">Visa Credential</option>
+                  <option value="DS2019Credential">DS-2019 Credential</option>
+                  <option value="I94Credential">I-94 Credential</option>
                 </select>
               </div>
               <div class="col-md-3">
@@ -111,7 +115,7 @@ export class IssueCredentialComponent {
         { key: 'programEndDate', label: 'Program End', placeholder: '2026-05-15' },
         { key: 'institutionName', label: 'Institution', placeholder: 'Test University' }
       ];
-    } else {
+    } else if (this.credentialType === 'FinancialSupportCredential') {
       this.claimFields = [
         { key: 'sevisId', label: 'SEVIS ID', placeholder: 'N0001234567' },
         { key: 'studentName', label: 'Student Name', placeholder: 'John Doe' },
@@ -122,6 +126,45 @@ export class IssueCredentialComponent {
         { key: 'livingExpenses', label: 'Living Expenses ($)', placeholder: '15000' },
         { key: 'personalFunds', label: 'Personal Funds ($)', placeholder: '10000' },
         { key: 'schoolFunds', label: 'School Funds ($)', placeholder: '30000' }
+      ];
+    } else if (this.credentialType === 'PassportCredential') {
+      this.claimFields = [
+        { key: 'holderName', label: 'Holder Name', placeholder: 'Jane Doe' },
+        { key: 'nationality', label: 'Nationality', placeholder: 'United States' },
+        { key: 'issuingState', label: 'Issuing State', placeholder: 'USA' },
+        { key: 'documentNumber', label: 'Document Number', placeholder: '123456789' },
+        { key: 'dateOfBirth', label: 'Date of Birth', placeholder: '1995-03-15' },
+        { key: 'expirationDate', label: 'Expiration Date', placeholder: '2035-03-14' },
+        { key: 'sex', label: 'Sex', placeholder: 'F' }
+      ];
+    } else if (this.credentialType === 'VisaCredential') {
+      this.claimFields = [
+        { key: 'holderName', label: 'Holder Name', placeholder: 'Jane Doe' },
+        { key: 'visaType', label: 'Visa Type/Classification', placeholder: 'F-1' },
+        { key: 'issuingPost', label: 'Issuing Post', placeholder: 'London' },
+        { key: 'issueDate', label: 'Issue Date', placeholder: '2024-06-01' },
+        { key: 'expirationDate', label: 'Expiration Date', placeholder: '2028-06-01' },
+        { key: 'stampNumber', label: 'Stamp Number', placeholder: '20241234567' },
+        { key: 'controlNumber', label: 'Control Number', placeholder: '20241234567890' }
+      ];
+    } else if (this.credentialType === 'DS2019Credential') {
+      this.claimFields = [
+        { key: 'sevisId', label: 'SEVIS ID', placeholder: 'N0001234567' },
+        { key: 'participantName', label: 'Participant Name', placeholder: 'Jane Doe' },
+        { key: 'programSponsor', label: 'Program Sponsor', placeholder: 'University Exchange Program' },
+        { key: 'programNumber', label: 'Program Number', placeholder: 'P-1-00001' },
+        { key: 'categoryCode', label: 'Category Code', placeholder: '1A' },
+        { key: 'programStartDate', label: 'Program Start', placeholder: '2024-08-15' },
+        { key: 'programEndDate', label: 'Program End', placeholder: '2025-08-14' }
+      ];
+    } else if (this.credentialType === 'I94Credential') {
+      this.claimFields = [
+        { key: 'holderName', label: 'Holder Name', placeholder: 'Jane Doe' },
+        { key: 'i94Number', label: 'I-94 Number', placeholder: '12345678901' },
+        { key: 'classOfAdmission', label: 'Class of Admission', placeholder: 'F-1' },
+        { key: 'admissionDate', label: 'Admission Date', placeholder: '2024-08-10' },
+        { key: 'admittedUntil', label: 'Admitted Until', placeholder: 'D/S' },
+        { key: 'portOfEntry', label: 'Port of Entry', placeholder: 'JFK' }
       ];
     }
   }

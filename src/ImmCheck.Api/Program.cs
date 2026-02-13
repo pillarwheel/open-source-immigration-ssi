@@ -69,10 +69,12 @@ builder.Services.AddScoped<IDocumentRepository<FinancialSupport>, DocumentReposi
 builder.Services.AddHttpClient<DidWebResolver>();
 builder.Services.AddHttpClient<DidPrismResolver>();
 builder.Services.AddHttpClient<DidCheqdResolver>();
+builder.Services.AddHttpClient<DidMidnightResolver>();
 builder.Services.AddSingleton<IDidResolver, DidKeyResolver>();
 builder.Services.AddScoped<IDidResolver, DidWebResolver>();
 builder.Services.AddScoped<IDidResolver, DidPrismResolver>();
 builder.Services.AddScoped<IDidResolver, DidCheqdResolver>();
+builder.Services.AddScoped<IDidResolver, DidMidnightResolver>();
 builder.Services.AddSingleton<IDidManager, DidKeyManager>();
 builder.Services.AddScoped<IDidManager, DidPrismResolver>();
 builder.Services.AddScoped<IDidPublisher, DidPrismResolver>();

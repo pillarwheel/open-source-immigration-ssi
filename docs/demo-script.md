@@ -236,15 +236,74 @@ curl http://localhost:5000/api/did/resolve/did:cheqd:mainnet:zF7rhDBfUt9d1gJPjx7
 # Returns: W3C DID Document with verification methods from cheqd blockchain
 ```
 
+## Step 13: Issue and verify a Passport credential (Sprint 9)
+
+```bash
+# Issue a passport credential
+curl -X POST http://localhost:5000/api/credential/issue \
+  -H "Content-Type: application/json" \
+  -d '{
+    "issuerDid": "did:key:z6MkDSOIssuer",
+    "subjectDid": "did:key:z6MkStudentAlice",
+    "credentialType": "PassportCredential",
+    "validityDays": 3650,
+    "claims": {
+      "holderName": "Alice Johnson",
+      "nationality": "United States",
+      "issuingState": "USA",
+      "documentNumber": "123456789",
+      "dateOfBirth": "1995-03-15",
+      "expirationDate": "2035-03-14",
+      "sex": "F"
+    }
+  }'
+# Returns: SD-JWT with passport claims
+
+# Verify the passport credential
+curl -X POST http://localhost:5000/api/credential/verify \
+  -H "Content-Type: application/json" \
+  -d '{"serializedCredential": "PASTE_SD_JWT_HERE"}'
+# Returns: { "isValid": true, "disclosedClaims": { "holderName": "Alice Johnson", ... } }
+```
+
+## Step 14: Selective disclosure — prove nationality without passport number
+
+```bash
+# Request passport identity verification (OID4VP)
+curl -X POST http://localhost:5000/api/oid4vp/request \
+  -H "Content-Type: application/json" \
+  -d '{"scenario": "passport-identity"}'
+# Returns: presentation request requiring nationality, expirationDate, holderName
+# The documentNumber and dateOfBirth are NOT required — they stay hidden
+
+# The student presents only the non-sensitive disclosures
+# Verifier sees: nationality=United States, expirationDate=2035-03-14, holderName=Alice Johnson
+# Verifier does NOT see: documentNumber, dateOfBirth, MRZ data
+```
+
+## Step 15: did:midnight resolution (when available)
+
+```bash
+# Check that midnight is in the supported DID methods
+curl http://localhost:5000/api/did/methods
+# Expected: {"resolve":["key","web","prism","cheqd","midnight"],"create":["key","prism"]}
+
+# Attempt to resolve a did:midnight identifier
+curl http://localhost:5000/api/did/resolve/did:midnight:testnet:abc123
+# Returns 404 — testnet resolver not available yet
+# When Midnight mainnet launches (late March 2026), this will resolve to a DID Document
+```
+
 ---
 
 ## Summary of what was demonstrated
 
 1. **DID Creation & Resolution** — Institutions get decentralized identifiers
-2. **Credential Issuance** — DSOs issue SD-JWT Verifiable Credentials for I-20 documents (now signed with Ed25519)
-3. **Selective Disclosure** — Students control which claims are revealed
+2. **Credential Issuance** — DSOs issue SD-JWT Verifiable Credentials for all 6 immigration document types (signed with Ed25519)
+3. **Selective Disclosure** — Students control which claims are revealed (e.g., prove nationality without passport number)
 4. **OID4VCI** — Standards-compliant credential issuance via pre-authorized code flow
-5. **OID4VP** — Standards-compliant presentation exchange with predefined verification scenarios
+5. **OID4VP** — Standards-compliant presentation exchange with 5 predefined verification scenarios
 6. **Revocation** — Credentials can be revoked with status list updates
 7. **Cardano Publication** — did:prism DIDs published to Cardano preprod testnet
-8. **Multi-Blockchain** — did:cheqd resolution demonstrates support beyond Cardano
+8. **Multi-Blockchain** — did:cheqd and did:midnight resolution demonstrates support beyond Cardano
+9. **Privacy-Preserving Verification** — Passport identity verification without exposing document number or date of birth

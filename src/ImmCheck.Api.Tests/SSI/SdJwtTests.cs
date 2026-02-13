@@ -223,6 +223,211 @@ public class SdJwtTests : IDisposable
         Assert.Null(CredentialSchemas.GetSchema("NonExistentCredential"));
     }
 
+    // --- Passport Credential Tests ---
+
+    [Fact]
+    public async Task Issue_PassportCredential_Succeeds()
+    {
+        var request = CreatePassportRequest();
+        var result = await _issuer.IssueAsync(request);
+
+        Assert.NotEmpty(result.CredentialId);
+        Assert.Equal("vc+sd-jwt", result.Format);
+        Assert.NotEmpty(result.SerializedCredential);
+    }
+
+    [Fact]
+    public async Task Issue_PassportCredential_SelectiveDisclosure_HidesDocumentNumber()
+    {
+        var request = CreatePassportRequest();
+        var issued = await _issuer.IssueAsync(request);
+
+        // Present with only first disclosure
+        var parts = issued.SerializedCredential.Split('~');
+        var jwt = parts[0];
+        var partialPresentation = $"{jwt}~{parts[1]}~";
+
+        var verification = await _issuer.VerifyAsync(partialPresentation);
+        Assert.True(verification.IsValid);
+        Assert.NotNull(verification.DisclosedClaims);
+    }
+
+    [Fact]
+    public async Task Verify_PassportCredential_Roundtrip()
+    {
+        var request = CreatePassportRequest();
+        var issued = await _issuer.IssueAsync(request);
+        var verification = await _issuer.VerifyAsync(issued.SerializedCredential);
+
+        Assert.True(verification.IsValid);
+        Assert.Null(verification.Error);
+        Assert.Equal("did:key:z6MkTestIssuer", verification.IssuerDid);
+    }
+
+    [Fact]
+    public void CredentialSchemas_Passport_HasRequiredClaims()
+    {
+        var schema = CredentialSchemas.GetSchema("PassportCredential");
+        Assert.NotNull(schema);
+        Assert.Contains("holderName", schema.RequiredClaims);
+        Assert.Contains("nationality", schema.RequiredClaims);
+        Assert.Contains("documentNumber", schema.RequiredClaims);
+        Assert.Contains("expirationDate", schema.RequiredClaims);
+    }
+
+    // --- Visa Credential Tests ---
+
+    [Fact]
+    public async Task Issue_VisaCredential_Succeeds()
+    {
+        var request = CreateVisaRequest();
+        var result = await _issuer.IssueAsync(request);
+
+        Assert.NotEmpty(result.CredentialId);
+        Assert.Equal("vc+sd-jwt", result.Format);
+        Assert.NotEmpty(result.SerializedCredential);
+    }
+
+    [Fact]
+    public async Task Issue_VisaCredential_SelectiveDisclosure_HidesControlNumber()
+    {
+        var request = CreateVisaRequest();
+        var issued = await _issuer.IssueAsync(request);
+
+        var parts = issued.SerializedCredential.Split('~');
+        var jwt = parts[0];
+        var partialPresentation = $"{jwt}~{parts[1]}~";
+
+        var verification = await _issuer.VerifyAsync(partialPresentation);
+        Assert.True(verification.IsValid);
+        Assert.NotNull(verification.DisclosedClaims);
+    }
+
+    [Fact]
+    public async Task Verify_VisaCredential_Roundtrip()
+    {
+        var request = CreateVisaRequest();
+        var issued = await _issuer.IssueAsync(request);
+        var verification = await _issuer.VerifyAsync(issued.SerializedCredential);
+
+        Assert.True(verification.IsValid);
+        Assert.Null(verification.Error);
+        Assert.Equal("did:key:z6MkTestIssuer", verification.IssuerDid);
+    }
+
+    [Fact]
+    public void CredentialSchemas_Visa_HasRequiredClaims()
+    {
+        var schema = CredentialSchemas.GetSchema("VisaCredential");
+        Assert.NotNull(schema);
+        Assert.Contains("holderName", schema.RequiredClaims);
+        Assert.Contains("visaType", schema.RequiredClaims);
+        Assert.Contains("issuingPost", schema.RequiredClaims);
+        Assert.Contains("expirationDate", schema.RequiredClaims);
+    }
+
+    // --- DS2019 Credential Tests ---
+
+    [Fact]
+    public async Task Issue_DS2019Credential_Succeeds()
+    {
+        var request = CreateDS2019Request();
+        var result = await _issuer.IssueAsync(request);
+
+        Assert.NotEmpty(result.CredentialId);
+        Assert.Equal("vc+sd-jwt", result.Format);
+        Assert.NotEmpty(result.SerializedCredential);
+    }
+
+    [Fact]
+    public async Task Issue_DS2019Credential_SelectiveDisclosure_HidesSevisId()
+    {
+        var request = CreateDS2019Request();
+        var issued = await _issuer.IssueAsync(request);
+
+        var parts = issued.SerializedCredential.Split('~');
+        var jwt = parts[0];
+        var partialPresentation = $"{jwt}~{parts[1]}~";
+
+        var verification = await _issuer.VerifyAsync(partialPresentation);
+        Assert.True(verification.IsValid);
+        Assert.NotNull(verification.DisclosedClaims);
+    }
+
+    [Fact]
+    public async Task Verify_DS2019Credential_Roundtrip()
+    {
+        var request = CreateDS2019Request();
+        var issued = await _issuer.IssueAsync(request);
+        var verification = await _issuer.VerifyAsync(issued.SerializedCredential);
+
+        Assert.True(verification.IsValid);
+        Assert.Null(verification.Error);
+        Assert.Equal("did:key:z6MkTestIssuer", verification.IssuerDid);
+    }
+
+    [Fact]
+    public void CredentialSchemas_DS2019_HasRequiredClaims()
+    {
+        var schema = CredentialSchemas.GetSchema("DS2019Credential");
+        Assert.NotNull(schema);
+        Assert.Contains("sevisId", schema.RequiredClaims);
+        Assert.Contains("participantName", schema.RequiredClaims);
+        Assert.Contains("programSponsor", schema.RequiredClaims);
+        Assert.Contains("categoryCode", schema.RequiredClaims);
+    }
+
+    // --- I94 Credential Tests ---
+
+    [Fact]
+    public async Task Issue_I94Credential_Succeeds()
+    {
+        var request = CreateI94Request();
+        var result = await _issuer.IssueAsync(request);
+
+        Assert.NotEmpty(result.CredentialId);
+        Assert.Equal("vc+sd-jwt", result.Format);
+        Assert.NotEmpty(result.SerializedCredential);
+    }
+
+    [Fact]
+    public async Task Issue_I94Credential_SelectiveDisclosure_HidesI94Number()
+    {
+        var request = CreateI94Request();
+        var issued = await _issuer.IssueAsync(request);
+
+        var parts = issued.SerializedCredential.Split('~');
+        var jwt = parts[0];
+        var partialPresentation = $"{jwt}~{parts[1]}~";
+
+        var verification = await _issuer.VerifyAsync(partialPresentation);
+        Assert.True(verification.IsValid);
+        Assert.NotNull(verification.DisclosedClaims);
+    }
+
+    [Fact]
+    public async Task Verify_I94Credential_Roundtrip()
+    {
+        var request = CreateI94Request();
+        var issued = await _issuer.IssueAsync(request);
+        var verification = await _issuer.VerifyAsync(issued.SerializedCredential);
+
+        Assert.True(verification.IsValid);
+        Assert.Null(verification.Error);
+        Assert.Equal("did:key:z6MkTestIssuer", verification.IssuerDid);
+    }
+
+    [Fact]
+    public void CredentialSchemas_I94_HasRequiredClaims()
+    {
+        var schema = CredentialSchemas.GetSchema("I94Credential");
+        Assert.NotNull(schema);
+        Assert.Contains("holderName", schema.RequiredClaims);
+        Assert.Contains("i94Number", schema.RequiredClaims);
+        Assert.Contains("classOfAdmission", schema.RequiredClaims);
+        Assert.Contains("admittedUntil", schema.RequiredClaims);
+    }
+
     public void Dispose() => _db.Dispose();
 
     private static CredentialIssuanceRequest CreateI20Request() => new()
@@ -241,6 +446,76 @@ public class SdJwtTests : IDisposable
             ["programStartDate"] = "2024-08-15",
             ["programEndDate"] = "2026-05-15",
             ["institutionName"] = "Test University"
+        }
+    };
+
+    private static CredentialIssuanceRequest CreatePassportRequest() => new()
+    {
+        IssuerDid = "did:key:z6MkTestIssuer",
+        SubjectDid = "did:key:z6MkTestStudent",
+        CredentialType = "PassportCredential",
+        ValidityDays = 365,
+        Claims = new Dictionary<string, object>
+        {
+            ["holderName"] = "Jane Doe",
+            ["nationality"] = "United States",
+            ["issuingState"] = "USA",
+            ["documentNumber"] = "123456789",
+            ["dateOfBirth"] = "1995-03-15",
+            ["expirationDate"] = "2035-03-14",
+            ["sex"] = "F"
+        }
+    };
+
+    private static CredentialIssuanceRequest CreateVisaRequest() => new()
+    {
+        IssuerDid = "did:key:z6MkTestIssuer",
+        SubjectDid = "did:key:z6MkTestStudent",
+        CredentialType = "VisaCredential",
+        ValidityDays = 365,
+        Claims = new Dictionary<string, object>
+        {
+            ["holderName"] = "Jane Doe",
+            ["visaType"] = "F-1",
+            ["issuingPost"] = "London",
+            ["issueDate"] = "2024-06-01",
+            ["expirationDate"] = "2028-06-01",
+            ["stampNumber"] = "20241234567",
+            ["controlNumber"] = "20241234567890"
+        }
+    };
+
+    private static CredentialIssuanceRequest CreateDS2019Request() => new()
+    {
+        IssuerDid = "did:key:z6MkTestIssuer",
+        SubjectDid = "did:key:z6MkTestStudent",
+        CredentialType = "DS2019Credential",
+        ValidityDays = 365,
+        Claims = new Dictionary<string, object>
+        {
+            ["sevisId"] = "N0001234567",
+            ["participantName"] = "Jane Doe",
+            ["programSponsor"] = "University Exchange Program",
+            ["programNumber"] = "P-1-00001",
+            ["categoryCode"] = "1A",
+            ["programStartDate"] = "2024-08-15",
+            ["programEndDate"] = "2025-08-14"
+        }
+    };
+
+    private static CredentialIssuanceRequest CreateI94Request() => new()
+    {
+        IssuerDid = "did:key:z6MkTestIssuer",
+        SubjectDid = "did:key:z6MkTestStudent",
+        CredentialType = "I94Credential",
+        ValidityDays = 365,
+        Claims = new Dictionary<string, object>
+        {
+            ["holderName"] = "Jane Doe",
+            ["i94Number"] = "12345678901",
+            ["classOfAdmission"] = "F-1",
+            ["admissionDate"] = "2024-08-10",
+            ["admittedUntil"] = "D/S"
         }
     };
 }

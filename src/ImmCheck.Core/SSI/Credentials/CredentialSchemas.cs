@@ -93,11 +93,156 @@ public static class CredentialSchemas
         }
     };
 
+    /// <summary>
+    /// Passport Credential — ICAO 9303 MRZ fields as verifiable claims.
+    /// Enables selective disclosure: prove nationality without revealing document number.
+    /// </summary>
+    public static readonly CredentialSchemaDefinition PassportCredential = new()
+    {
+        Type = "PassportCredential",
+        Description = "Passport Identity Document — ICAO 9303 MRZ fields as verifiable claims",
+        RequiredClaims = new[]
+        {
+            "holderName",
+            "nationality",
+            "issuingState",
+            "documentNumber",
+            "dateOfBirth",
+            "expirationDate",
+            "sex"
+        },
+        OptionalClaims = new[]
+        {
+            "givenName",
+            "surname",
+            "passportType",
+            "issuanceDate",
+            "placeOfBirth",
+            "mrzLine1",
+            "mrzLine2"
+        },
+        DefaultSelectiveDisclosure = new[]
+        {
+            "documentNumber",
+            "dateOfBirth",
+            "mrzLine1",
+            "mrzLine2"
+        }
+    };
+
+    /// <summary>
+    /// Visa Credential — U.S. visa stamp classification and validity as verifiable claims.
+    /// </summary>
+    public static readonly CredentialSchemaDefinition VisaCredential = new()
+    {
+        Type = "VisaCredential",
+        Description = "U.S. Visa Stamp — visa classification and validity as verifiable claims",
+        RequiredClaims = new[]
+        {
+            "holderName",
+            "visaType",
+            "issuingPost",
+            "issueDate",
+            "expirationDate"
+        },
+        OptionalClaims = new[]
+        {
+            "stampNumber",
+            "controlNumber",
+            "entryDate",
+            "annotations",
+            "numberOfEntries",
+            "nationality"
+        },
+        DefaultSelectiveDisclosure = new[]
+        {
+            "stampNumber",
+            "controlNumber",
+            "nationality"
+        }
+    };
+
+    /// <summary>
+    /// DS-2019 Credential — Certificate of Eligibility for J-1 Exchange Visitor Status.
+    /// </summary>
+    public static readonly CredentialSchemaDefinition DS2019Credential = new()
+    {
+        Type = "DS2019Credential",
+        Description = "DS-2019 Certificate of Eligibility for J-1 Exchange Visitor Status",
+        RequiredClaims = new[]
+        {
+            "sevisId",
+            "participantName",
+            "programSponsor",
+            "programNumber",
+            "categoryCode",
+            "programStartDate",
+            "programEndDate"
+        },
+        OptionalClaims = new[]
+        {
+            "subjectField",
+            "sponsorAddress",
+            "officialName",
+            "officialTitle",
+            "issuanceDate"
+        },
+        DefaultSelectiveDisclosure = new[]
+        {
+            "sevisId",
+            "participantName",
+            "programStartDate",
+            "programEndDate"
+        }
+    };
+
+    /// <summary>
+    /// I-94 Credential — Arrival/Departure Record admission status as verifiable claims.
+    /// </summary>
+    public static readonly CredentialSchemaDefinition I94Credential = new()
+    {
+        Type = "I94Credential",
+        Description = "I-94 Arrival/Departure Record — admission status as verifiable claims",
+        RequiredClaims = new[]
+        {
+            "holderName",
+            "i94Number",
+            "classOfAdmission",
+            "admissionDate",
+            "admittedUntil"
+        },
+        OptionalClaims = new[]
+        {
+            "portOfEntry",
+            "departureDate",
+            "durationOfStatus"
+        },
+        DefaultSelectiveDisclosure = new[]
+        {
+            "i94Number",
+            "holderName"
+        }
+    };
+
     public static CredentialSchemaDefinition? GetSchema(string credentialType) => credentialType switch
     {
         "I20Credential" => I20Credential,
         "FinancialSupportCredential" => FinancialSupportCredential,
+        "PassportCredential" => PassportCredential,
+        "VisaCredential" => VisaCredential,
+        "DS2019Credential" => DS2019Credential,
+        "I94Credential" => I94Credential,
         _ => null
+    };
+
+    public static CredentialSchemaDefinition[] GetAllSchemas() => new[]
+    {
+        I20Credential,
+        FinancialSupportCredential,
+        PassportCredential,
+        VisaCredential,
+        DS2019Credential,
+        I94Credential
     };
 }
 

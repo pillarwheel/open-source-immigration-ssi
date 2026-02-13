@@ -24,7 +24,7 @@ public class DidEndpointTests : IClassFixture<CustomWebApplicationFactory>
         var doc = JsonDocument.Parse(json);
 
         var resolve = doc.RootElement.GetProperty("resolve");
-        Assert.True(resolve.GetArrayLength() >= 3);
+        Assert.True(resolve.GetArrayLength() >= 5);
 
         var create = doc.RootElement.GetProperty("create");
         Assert.Contains("key", create.EnumerateArray().Select(e => e.GetString()));
@@ -139,5 +139,27 @@ public class DidEndpointTests : IClassFixture<CustomWebApplicationFactory>
         var resolve = doc.RootElement.GetProperty("resolve");
         var methods = resolve.EnumerateArray().Select(e => e.GetString()).ToList();
         Assert.Contains("cheqd", methods);
+    }
+
+    [Fact]
+    public async Task GetMethods_IncludesMidnight()
+    {
+        var response = await _client.GetAsync("/api/did/methods");
+        response.EnsureSuccessStatusCode();
+
+        var json = await response.Content.ReadAsStringAsync();
+        var doc = JsonDocument.Parse(json);
+
+        var resolve = doc.RootElement.GetProperty("resolve");
+        var methods = resolve.EnumerateArray().Select(e => e.GetString()).ToList();
+        Assert.Contains("midnight", methods);
+    }
+
+    [Fact]
+    public async Task ResolveMidnightDid_WithoutResolver_ReturnsNotFound()
+    {
+        // Midnight testnet isn't running in tests, so resolution should fail gracefully
+        var response = await _client.GetAsync("/api/did/resolve/did:midnight:testnet:abc123");
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 }

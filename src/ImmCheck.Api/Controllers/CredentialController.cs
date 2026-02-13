@@ -143,11 +143,7 @@ public class CredentialController : ControllerBase
     [HttpGet("schemas")]
     public ActionResult GetSchemas()
     {
-        return Ok(new[]
-        {
-            CredentialSchemas.I20Credential,
-            CredentialSchemas.FinancialSupportCredential
-        });
+        return Ok(CredentialSchemas.GetAllSchemas());
     }
 }
 
